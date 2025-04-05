@@ -1,20 +1,18 @@
-# Используем Python 3.10
+# Используем официальный Python образ
 FROM python:3.10-slim
 
-# Устанавливаем рабочую директорию
+# Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
-# Копируем зависимости
-COPY requirements.txt .
+# Копируем все файлы проекта
+COPY . /app
 
-# Устанавливаем зависимости
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Переход в нужную директорию, где находится app.py
+WORKDIR /app/YoutubeMessenger-master
 
-# Копируем весь проект
-COPY . .
+# Установка зависимостей
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-# Открываем нужный порт
-EXPOSE 8000
-
-# Запускаем приложение
+# Команда запуска
 CMD ["python", "app.py"]
