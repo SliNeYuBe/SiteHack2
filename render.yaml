@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: youtube-messenger
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile

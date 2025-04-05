@@ -1,0 +1,7 @@
+Flask
+requests
+sqlalchemy
+flask_sqlalchemy
+flask_mail
+flask_migrate
+greenlet
