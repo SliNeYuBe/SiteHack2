@@ -19,19 +19,18 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 
+# Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'gritsenko.cooperation@gmail.com'  # замените на вашу почту
-app.config['MAIL_DEFAULT_SENDER'] = 'gritsenko.cooperation@gmail.com'  # и это тоже
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASS', 'Your password')  # замените или задайте переменную окружения
+app.config['MAIL_USERNAME'] = 'gritsenko.cooperation@gmail.com'
+app.config['MAIL_DEFAULT_SENDER'] = 'gritsenko.cooperation@gmail.com'
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASS', 'Your password')
 mail = Mail(app)
-
 
 @login_manager.user_loader
 def load_user(id):
     return db.session.query(UserModel).get(id)
-
 
 # === ROUTES ===
 
@@ -41,7 +40,6 @@ def MainForAnon():
         return redirect(url_for("MainPage"))
     return render_template("main_anon.html")
 
-
 @app.route("/info_user/<int:id>")
 @login_required
 def infoUserId(id):
@@ -50,11 +48,9 @@ def infoUserId(id):
     date, time = created.split(' ')
     y, m, d = date.split('-')
     h, mi, s = time.split(':')
-
     return render_template("info_user_id.html", user=user,
                            date={'year': y, 'month': m, 'day': d},
                            time={'hour': h, 'minute': mi, 'second': s})
-
 
 @app.route("/support/", methods=['POST', 'GET'])
 def Support():
@@ -66,19 +62,16 @@ def Support():
         flash("Сообщение успешно отправлено!")
     return render_template("support.html", form=form)
 
-
 @app.route("/info_users/")
 def infoUser():
     All = db.session.query(UserModel).all()
     return render_template("info_user.html", all=All)
-
 
 @app.route("/main/", methods=['GET', 'POST'])
 @login_required
 def MainPage():
     AllUsers = db.session.query(UserModel).all()
     return render_template("main_page.html", all=AllUsers)
-
 
 @app.route("/update_acc/<int:id>/", methods=["POST", "GET"])
 @login_required
@@ -98,7 +91,6 @@ def UpdateAcc(id):
                 flash("Ник обновлен")
             else:
                 flash("Ник должен быть от 4 до 16 символов")
-
         elif new_nick:
             flash("Пользователь с таким ником уже существует")
 
@@ -115,7 +107,6 @@ def UpdateAcc(id):
 
     return render_template("upd_acc.html", form=form)
 
-
 @app.route("/delete_acc/<int:id>/")
 @login_required
 def DeleteAcc(id):
@@ -130,7 +121,6 @@ def DeleteAcc(id):
     else:
         flash("Нельзя удалить чужой аккаунт!")
     return render_template("del_acc.html")
-
 
 @app.route("/chat/", methods=["GET", "POST"])
 @login_required
@@ -148,7 +138,6 @@ def Chat():
         return redirect(url_for("Chat"))
 
     return render_template("chat.html", form=form, data=data, TimeData=TimeData)
-
 
 @app.route("/registration/", methods=['POST', 'GET'])
 def Reg():
@@ -174,11 +163,9 @@ def Reg():
 
     return render_template("registration.html", form=form)
 
-
 @app.route("/login/", methods=["POST", "GET"])
 def Login():
     form = LoginForm()
-
     if current_user.is_authenticated:
         return redirect(url_for("MainPage"))
 
@@ -196,22 +183,18 @@ def Login():
 
     return render_template("login.html", form=form)
 
-
 @app.route("/logout_user/")
 def LogOut():
     logout_user()
     return redirect("/login")
 
-
 @app.errorhandler(401)
 def NotAuthorised(error):
     return render_template("NotAuthorised.html")
 
-
 @app.errorhandler(404)
 def NotFound(error):
     return render_template("error404.html")
-
 
 # === MODELS ===
 
@@ -233,7 +216,6 @@ class UserModel(db.Model, UserMixin):
     def __repr__(self):
         return f"<id:{self.id}>, <nick:{self.nick}>"
 
-
 class MessagesModel(db.Model):
     __tablename__ = 'messages'
     id_message = db.Column(db.Integer, primary_key=True)
@@ -245,8 +227,8 @@ class MessagesModel(db.Model):
     def __repr__(self):
         return f'{self.id_message}, {self.message}'
 
-
 # === RUN ===
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
