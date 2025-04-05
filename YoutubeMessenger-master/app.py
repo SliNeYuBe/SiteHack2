@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, current_user, login_user, logout_user, login_required
 from flask_mail import Mail, Message
+from models import db
 import os
 
 app = Flask(__name__)
@@ -228,6 +229,8 @@ class MessagesModel(db.Model):
         return f'{self.id_message}, {self.message}'
 
 # === RUN ===
+with app.app_context():
+    db.create_all()
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
